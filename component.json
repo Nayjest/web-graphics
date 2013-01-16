@@ -1,0 +1,12 @@
+{
+  "About this file": "Bower package",
+  "name": "graphics",
+  "version": "1.0.0",
+  "main": "./lib",
+  "dependencies": {
+    "Node":"last",
+    "jquery":"last",
+    "underscore":"last",
+    "require":"last"
+  }
+}
