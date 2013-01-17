@@ -102,7 +102,10 @@ define [
     Redraws layer
     ###
     redraw: ->
-      #update children elements
+      @redrawChildren()
+
+    redrawChildren: ->
+
       children = @getChildren()
       for child in children
         child.redraw()

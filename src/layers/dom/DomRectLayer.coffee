@@ -1,25 +1,25 @@
-define ['lib.nayjest/graphics/layers/dom/DomLayer', 'jquery'], (DomLayer, $)->
-  defaults =
-  color:'gray'
-  borderColor:'red'
-  borderWidth:1
-  tag:'div'
+define ['components/graphics/lib/layers/DomLayer'], (DomLayer)->
+
+  _defaults =
+    color: 'gray'
+    borderColor: 'red'
+    borderWidth: 1
 
   class DomRectLayer extends DomLayer
-    constructor:(config)->
-      options = $.extend defaults, config
-      super options
-      @setColor options.color
-      @setBorderColor options.borderColor
-    setColor:(color)->
-      @color = color
-      @$el.css 'background-color', color
-    setBorderColor:(color)->
-      @borderColor = color
-      @$el.css 'border-color', color
-    setBorderWidth:(width)->
-      @width  = width
-      @$el.css 'border-width', width+'px'
+    constructor: (config = {})->
+      super config
+      @setColor config.color or _defaults.color
+      @setBorderColor config.borderColor or _defaults.borderColor
+      @setBorderWidth config.borderWidth or _defaults.borderWidth
+
+    setColor: (@_color)->
+      @$el.css 'background-color', @_color
+
+    setBorderColor: (@_borderColor)->
+      @$el.css 'border-color', @_borderColor
+
+    setBorderWidth: (@_borderWidth)->
+      @$el.css 'border-width', @_borderWidth + 'px'
 
 
 

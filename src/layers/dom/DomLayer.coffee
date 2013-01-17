@@ -23,6 +23,7 @@ define [
     @option config {Object|null} css DOM Element css
     @option config {Object|null} attr DOM Element attributes
     @option config {Object|null} $el DOM Element wrapped to jQuery object
+    @option config {DomElement|jQuery|selector|null} domContainer
     ###
     constructor: (config)->
       @_createDomElement config
@@ -30,6 +31,8 @@ define [
 
     _createDomElement: (config = {})->
       @$el = config.$el or _defaults.get$el()
+      if config.$parentEl
+        @_setParentEl  config.$parentEl
       @$el.css  _.defaults {}, config.css, _defaults.getCss()
       @$el.attr _.defaults {}, config.attr, _defaults.getAttr()
       @$el.get(0).layer = @
@@ -85,8 +88,8 @@ define [
           transform: val
       super()
 
-    _setParentEl: ($parentEl) ->
-      @$parentEl = $parentEl
+    setParentEl: ($parentEl) ->
+      @$parentEl = $ $parentEl
       @$el.appendTo @$parentEl
 
     # @todo consider viewport, use it insted of $('body')
@@ -96,7 +99,7 @@ define [
         @setParentEl parent.$el
       else
         if !@$parentEl
-          @_setParentEl $('body')
+          @setParentEl $('body')
       @
 
     destroy: ->

@@ -8,4 +8,6 @@ define [
   AbstractLayer
 )->
   class AbstractViewport extends AbstractLayer
-    constructor: (@$parent)->
+    constructor: (config)->
+
+      super config
