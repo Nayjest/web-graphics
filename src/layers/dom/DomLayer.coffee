@@ -1,17 +1,26 @@
+###
+Module DomLayer
+@author Vitalii [Nayjest] Stepanenko <gmail@vitaliy.in>
+###
 define [
   'components/graphics/lib/layers/AbstractLayer',
+  'components/Vector2D/Vector2D',
   #"JqueryEventsMixin",
   "components/jquery/jquery",
   "components/underscore/underscore"
 ], (
   AbstractLayer,
+  Vector2D
   # JqueryEventsMixin
 ) ->
+  "use strict"
   _radInDeg = Math.PI / 180
-  _defaults =
+  defaults =
     getCss: ->
       outline: '1px dotted gray'
       position:'absolute'
+      padding: 0
+      margin: 0
       top:0
       left:0
     tag: 'div'
@@ -33,11 +42,11 @@ define [
       super config
 
     _createDomElement: (config = {})->
-      @$el = config.$el or _defaults.get$el()
+      @$el = config.$el or defaults.get$el()
       if config.$parentEl
-        @_setParentEl  config.$parentEl
-      @$el.css  _.defaults {}, config.css, _defaults.getCss()
-      @$el.attr _.defaults {}, config.attr, _defaults.getAttr()
+        @setParentEl  config.$parentEl
+      @$el.css  _.defaults {}, config.css, defaults.getCss()
+      @$el.attr _.defaults {}, config.attr, defaults.getAttr()
       @$el.get(0).layer = @
 
     ###
@@ -52,38 +61,39 @@ define [
       @
 
     _getNonDomLayersOffset: ->
-      parents = @getParents()
-      x = 0
-      y = 0
-      for parent in parents
-        if parent instanceof DomLayer
-          break
-        x+= parent.getOffset()[0]
-        y+= parent.getOffset()[1]
-      [x, y]
+      pos = new Vector2D()
+      for layer in @getParents()
+        break if layer instanceof DomLayer
+        pos.add layer.pos
+      pos
 
     _calcDomOffset: ->
       parentOffset = @$parentEl.offset()
+      parentOffset = new Vector2D parentOffset.left, parentOffset.top
       zoom = @getAbsoluteZoom()
-      w = @getSize()[0] * zoom
-      h = @getSize()[1] * zoom
-      innerTopRightPos = [ (@$parentEl.width() - w) / 2, (@$parentEl.height() - h) / 2 ]
-      a = @getAngle()
-      if a
-        d = Math.sqrt(w * w + h * h)
-        a = (90 - a % 90) * _radInDeg
-        innerTopRightPos[1] += (h - d * Math.sin(a + Math.acos(w / d))) / 2
-        innerTopRightPos[0] += (w - d * Math.cos(Math.asin(h / d) - a)) / 2
+      size = @size.clone().multiplyScalar zoom
+      domParentSize = new Vector2D @$parentEl.width(), @$parentEl.height()
+      innerTopRightPos = domParentSize.substract(size).multiplyScalar(0.5)
+      if @angle
+        d = size.magnitude()
+        a = Math.PI/2 - @angleRad % Math.PI/2
+        innerTopRightPos.add
+          x: (size.x - d * Math.cos(Math.asin(size.y / d) - a)) / 2
+          y: (size.y - d * Math.sin(a + Math.acos(size.x / d))) / 2
       nonDomOffset = @_getNonDomLayersOffset()
-      left: parentOffset.left + innerTopRightPos[0] + @getOffset()[0] * zoom + nonDomOffset[0]
-      top: parentOffset.top + innerTopRightPos[1] + @getOffset()[1] * zoom + nonDomOffset[1]
+      res = parentOffset
+        .add(innerTopRightPos)
+        .add(@pos.clone().multiplyScalar(zoom))
+        .add(nonDomOffset)
+      left: res.x
+      top: res.y
 
     redraw: ->
-      val = "rotate(" + @getAngle() + "deg)"
+      val = "rotate(" + @angle + "deg)"
       @$el
         .offset(@_calcDomOffset())
-        .width(@getSize()[0] * @getZoom())
-        .height(@getSize()[1] * @getZoom())
+        .width(@size.x * @zoom)
+        .height(@size.y * @zoom)
         .css
           "-moz-transform": val
           "-webkit-transform": val
@@ -111,11 +121,11 @@ define [
 
     getScreenPos: ->
       offset = @$el.offset()
-      [ offset.left - window.pageXOffset, offset.top - window.pageYOffset ]
+      new Vector2D( offset.left - window.pageXOffset, offset.top - window.pageYOffset )
 
     getCenterScreenPos: ->
-      pos = @getScreenPos()
-      [ pos[0] + ~~(@size[0] / 2), pos[1] + ~~(@size[1] / 2) ]
+      @getScreenPos().add(@size.clone().multiplyScalar(0.5))
+
 
   #$.extend DomLayer.prototype, JqueryEventsMixin
   DomLayer

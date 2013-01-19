@@ -1,20 +1,13 @@
 ###
 module AbstractLayer
+@author Vitalii [Nayjest] Stepanenko <gmail@vitaliy.in>
 ###
 define [
   'components/Node/Node',
+  'components/Vector2D/Vector2D',
   'components/jquery/jquery'
-], (
-  Node
-) ->
-  _defaults =
-    x: 0
-    y: 0
-    w: 100
-    h: 100
-    zIndex: 1
-    angle: 0
-    zoom: 1
+], (Node, Vector2D) ->
+  "use strict"
 
   ###
   Base layer class
@@ -25,11 +18,31 @@ define [
   ###
   class AbstractLayer extends Node
 
+  # Language helpers:
+    get = (props) =>
+      @:: __defineGetter__ name, getter for name, getter of props
+    set = (props) =>
+      @:: __defineSetter__ name, setter for name, setter of props
+
+    TO_RADIANS = Math.PI / 180
+    TO_DEGREES = 180 / Math.PI
+
+    defaults =
+      pos:
+        x: 0
+        y: 0
+      size:
+        x: 100
+        y: 100
+      zIndex: 1
+      angle: 0
+      zoom: 1
+
     ###
     @param {Object|null} config
-    @option config {Array|null} offset [x,y] Offset in pixels
-    @option config {Array|null} size [x,y] Size in pixels
-    @option config {Number|null} zIndex css z-index of created canvas DOM Object
+    @option config {Vector2D|object|null} pos position
+    @option config {Vector2D|object|null} size size
+    @option config {Number|null} zIndex
     @option config {Number|null} zoom
     @option config {Number|null} angle in degrees
     @option config {AbstractLayer|null} parent
@@ -37,65 +50,43 @@ define [
     ###
     constructor: (config = {}) ->
       super config.parent, config.children
-      @setOffset config.offset or [_defaults.x, _defaults.y]
-      @setSize config.size or [_defaults.w, _defaults.h]
-      @setZIndex config.zIndex or _defaults.zIndex
-      @setZoom config.zoom or _defaults.zoom
-      @setAngle config.angle or _defaults.angle
+      @pos = Vector2D.cloneFrom config.pos or defaults.pos
+      @size = Vector2D.cloneFrom config.size or defaults.size
+      @zIndex = config.zIndex or defaults.zIndex
+      @zoom = config.zoom or defaults.zoom
+      if config.angle
+        @angle = config.angle
+      else
+        if config.angleRad
+          @angleRad = config.angleRad
+        else
+          @angle = defaults.angle
       @ready = $.Deferred()
       if @isReadyAfterConstruct
         @ready.resolve @
 
-    defaults: _defaults
-
     isReadyAfterConstruct: yes
 
-    ###
-    @param {Number} zIndex
-    ###
-    setZIndex: (@_zIndex) -> @
+    get angle: -> @_angle
+    set angle: (val) ->
+      @_angle = val
+      @_angleRad = val * TO_RADIANS
 
-    getZIndex: -> @_zIndex
+    get angleRad: -> @_angleRad
+    set angleRad: (val)->
+      @_angle = val
+      @_angleRad = val * TO_DEGREES
 
-    setOffset: (offset) ->
-      @_offset = offset.slice 0
-      @
 
-    getOffset: -> @_offset
 
-    setSize: (size) ->
-      @_size = size.slice 0
-      @
-
-    getSize: -> @_size
-
-    ###
-    @param {Number} angle in degrees
-    ###
-    setAngle: (@_angle)-> @
-
-    getAngle: -> @_angle
-
-    setZoom: (@_zoom)-> @
-
-    getZoom: -> @_zoom
-
-    ###
-    @return {Array<Number>} [x,y]
-    ###
-    getAbsoluteOffset: ->
-      layer = @
-      x = @getOffset()[0]
-      y = @getOffset()[1]
-      while layer = layer.getParent()
-        x += layer.getOffset()[0]
-        y += layer.getOffset()[1]
-      [x, y]
+    getAbsolutePos: ->
+      pos = @pos.clone()
+      pos.add layer.pos for layer in @getParents()
+      pos
 
     getAbsoluteZoom: ->
-      zoom = @_zoom
-      layer = @
-      zoom *= layer.getZoom()  while layer = layer.getParent()
+      zoom = @zoom
+      zoom *= layer.zoom for layer in @getParents()
       zoom
 
     ###
@@ -105,10 +96,8 @@ define [
       @redrawChildren()
 
     redrawChildren: ->
-
       children = @getChildren()
-      for child in children
-        child.redraw()
+      child.redraw() for child in children
       @
 
     # Method to free resources

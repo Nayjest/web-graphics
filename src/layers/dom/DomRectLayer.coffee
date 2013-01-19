@@ -1,9 +1,13 @@
+###
+Module DomLayer
+@author Vitalii [Nayjest] Stepanenko <gmail@vitaliy.in>
+###
 define ['components/graphics/lib/layers/dom/DomLayer'], (DomLayer)->
-
+  "use strict"
   _defaults =
     color: 'gray'
     borderColor: 'red'
-    borderWidth: 1
+    borderWidth: 0
 
   class DomRectLayer extends DomLayer
     constructor: (config = {})->
@@ -19,6 +23,10 @@ define ['components/graphics/lib/layers/dom/DomLayer'], (DomLayer)->
       @$el.css 'border-color', @_borderColor
 
     setBorderWidth: (@_borderWidth)->
+      if @_borderWidth
+        @$el.css 'border-style', 'solid'
+      else
+        @$el.css 'border-style', 'none'
       @$el.css 'border-width', @_borderWidth + 'px'
 
 

@@ -2,11 +2,13 @@
   "About this file": "Bower package",
   "name": "graphics",
   "version": "1.0.0",
+  "author": "Vitalii [Nayjest] Stepanenko <gmail@vitaliy.in>",
   "main": "./lib",
   "dependencies": {
     "Node":"last",
     "jquery":"last",
     "underscore":"last",
-    "require":"last"
+    "require":"last",
+    "Vector2D":"last"
   }
 }
