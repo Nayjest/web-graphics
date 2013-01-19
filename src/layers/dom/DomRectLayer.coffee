@@ -1,4 +1,4 @@
-define ['components/graphics/lib/layers/DomLayer'], (DomLayer)->
+define ['components/graphics/lib/layers/dom/DomLayer'], (DomLayer)->
 
   _defaults =
     color: 'gray'

@@ -10,7 +10,10 @@ define [
   _radInDeg = Math.PI / 180
   _defaults =
     getCss: ->
-      outline: "1px dotted gray"
+      outline: '1px dotted gray'
+      position:'absolute'
+      top:0
+      left:0
     tag: 'div'
     get$el: ->
       $ "<#{@tag}/>"
@@ -52,11 +55,11 @@ define [
       parents = @getParents()
       x = 0
       y = 0
-      for paret in parents
+      for parent in parents
         if parent instanceof DomLayer
           break
-        x+= parent.offset[0]
-        y+= parent.offset[1]
+        x+= parent.getOffset()[0]
+        y+= parent.getOffset()[1]
       [x, y]
 
     _calcDomOffset: ->
