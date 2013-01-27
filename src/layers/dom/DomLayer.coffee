@@ -115,7 +115,7 @@ define [
           @setParentEl $('body')
       @
 
-    destroy: ->
+    destructor: ->
       @$el.detach()
       super()
 

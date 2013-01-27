@@ -101,4 +101,4 @@ define [
       @
 
     # Method to free resources
-    destroy: ->
+    destructor: ->
