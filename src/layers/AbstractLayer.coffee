@@ -11,8 +11,6 @@ define [
 
   ###
   Base layer class
-  @method #show()
-  @method #hide()
   @method #getScreenPos()
   @method #getCenterScreenPos()
   ###
@@ -37,6 +35,9 @@ define [
       zIndex: 1
       angle: 0
       zoom: 1
+      visible: yes
+
+    viewportClass: null
 
     ###
     @param {Object|null} config
@@ -49,11 +50,25 @@ define [
     @option config {Array<AbstractLayer>|null} children
     ###
     constructor: (config = {}) ->
-      super config.parent, config.children
+      if config.parent
+        super config.parent, config.children
+        if @viewportClass
+          @viewport = @getRoot()
+          if !(@viewport instanceof @viewportClass)
+            @viewport = @viewportClass.getDefault()
+      else
+        if @viewportClass
+          @viewport = parent = @viewportClass.getDefault()
+        else
+          parent = null
+        super parent, config.children
+
+
       @pos = Vector2D.cloneFrom config.pos or defaults.pos
       @size = Vector2D.cloneFrom config.size or defaults.size
       @zIndex = config.zIndex or defaults.zIndex
       @zoom = config.zoom or defaults.zoom
+      @visible = config.visible or defaults.visible
       if config.angle
         @angle = config.angle
       else
@@ -78,6 +93,14 @@ define [
       @_angleRad = val * TO_DEGREES
 
 
+    show: ->
+      @visible = true
+      @
+
+    hide: ->
+      @visible = false
+      @
+
 
     getAbsolutePos: ->
       pos = @pos.clone()
@@ -93,7 +116,8 @@ define [
     Redraws layer
     ###
     redraw: ->
-      @redrawChildren()
+      if @visible
+        @redrawChildren()
 
     redrawChildren: ->
       children = @getChildren()
