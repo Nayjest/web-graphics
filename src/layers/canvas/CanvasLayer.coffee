@@ -29,3 +29,15 @@ Vector2D
 
     getAbsolutePos: ->
       super().add(@viewport.size.clone().divideScalar(2))
+
+    # Active layer
+    on: (eventName, handler) ->
+      #@todo support custom events
+      @_bindMouseEvent(eventName, handler)
+
+    _bindMouseEvent: (eventName, handler) ->
+      @viewport.$el.on eventName, (event)=>
+        # @todo: implement geometry, different collision checks
+        pos = @getAbsolutePos()
+        if (Math.abs(pos.x - event.offsetX) < @size.x / 2) and (Math.abs(pos.y - event.offsetY) < @size.y / 2)
+          handler.call @, event

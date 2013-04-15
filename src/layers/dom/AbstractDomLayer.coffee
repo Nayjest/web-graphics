@@ -75,7 +75,7 @@ Vector2D
       innerTopRightPos = domParentSize.substract(size).multiplyScalar(0.5)
       if @angle
         d = size.magnitude()
-        a = Math.PI/2 - @angleRad % Math.PI/2
+        a = Math.PI / 2 - @angleRad % Math.PI / 2
         innerTopRightPos.add
           x: (size.x - d * Math.cos(Math.asin(size.y / d) - a)) / 2
           y: (size.y - d * Math.sin(a + Math.acos(size.x / d))) / 2
