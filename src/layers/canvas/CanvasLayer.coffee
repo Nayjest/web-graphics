@@ -36,8 +36,20 @@ Vector2D
       @_bindMouseEvent(eventName, handler)
 
     _bindMouseEvent: (eventName, handler) ->
-      @viewport.$el.on eventName, (event)=>
-        # @todo: implement geometry, different collision checks
-        pos = @getAbsolutePos()
-        if (Math.abs(pos.x - event.offsetX) < @size.x / 2) and (Math.abs(pos.y - event.offsetY) < @size.y / 2)
-          handler.call @, event
+      if eventName in ['mouseover','mouseout']
+        @viewport.$el.on 'mousemove', (event)=>
+          pos = @getAbsolutePos()
+          if (Math.abs(pos.x - event.offsetX) < @size.x / 2) and (Math.abs(pos.y - event.offsetY) < @size.y / 2)
+            if !@_isHovered and eventName == 'mouseover'
+                @_isHovered = yes
+                handler.call @, event
+          else
+            if @_isHovered and eventName == 'mouseout'
+              @_isHovered = no
+              handler.call @, event
+      else
+        @viewport.$el.on eventName, (event)=>
+          # @todo: implement geometry, different collision checks
+          pos = @getAbsolutePos()
+          if (Math.abs(pos.x - event.offsetX) < @size.x / 2) and (Math.abs(pos.y - event.offsetY) < @size.y / 2)
+            handler.call @, event
