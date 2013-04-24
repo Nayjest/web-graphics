@@ -8,6 +8,7 @@
     "Node":"last",
     "jquery":"last",
     "underscore":"last",
-    "Vector2D":"last"
+    "Vector2D":"last",
+    "geometry":"last"
   }
 }
