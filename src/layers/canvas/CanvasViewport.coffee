@@ -13,7 +13,7 @@ define [
       defaults =
         context: CanvasViewport.CONTEXT.CANVAS_2D
       coreOptions =
-        $el: $ '<canvas/>'
+        $el: $ '<canvas class="viewport" data-type="viewport" />'
       finalConfig = _.defaults coreOptions, config, defaults
       super finalConfig
       @setContext finalConfig.context
@@ -35,3 +35,4 @@ define [
       @
         .clear()
         .redrawChildren()
+

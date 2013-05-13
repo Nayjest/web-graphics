@@ -3,7 +3,7 @@ Module DomLayer
 @author Vitalii [Nayjest] Stepanenko <gmail@vitaliy.in>
 ###
 define [
-  'components/graphics/lib/layers/AbstractLayer',
+  'components/graphics/lib/layers/AbstractActiveLayer',
   'components/Vector2D/Vector2D',
   #"JqueryEventsMixin",
   "components/jquery/jquery",
@@ -74,16 +74,16 @@ Vector2D
       domParentSize = new Vector2D @$parentEl.width(), @$parentEl.height()
       innerTopRightPos = domParentSize.substract(size).multiplyScalar(0.5)
       if @angle
-        d = size.magnitude()
-        a = Math.PI / 2 - @angleRad % Math.PI / 2
-        innerTopRightPos.add
-          x: (size.x - d * Math.cos(Math.asin(size.y / d) - a)) / 2
-          y: (size.y - d * Math.sin(a + Math.acos(size.x / d))) / 2
+          d = size.magnitude()
+          a = (90 - @angle % 90) * (Math.PI / 180)
+          angleMod =
+            x: (size.x - d * Math.cos(Math.asin(size.y / d) - a)) / 2
+            y: (size.y - d * Math.sin(a + Math.acos(size.x / d))) / 2
+          innerTopRightPos.add angleMod
+
+
       nonDomOffset = @_getNonDomLayersOffset()
-      res = parentOffset
-      .add(innerTopRightPos)
-      .add(@pos.clone().multiplyScalar(zoom))
-      .add(nonDomOffset)
+      res = parentOffset.add(innerTopRightPos).add(@pos.clone().multiplyScalar(zoom)).add(nonDomOffset)
       left: res.x
       top: res.y
 

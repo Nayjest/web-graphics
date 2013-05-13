@@ -20,14 +20,14 @@ define ['components/graphics/lib/layers/dom/DomLayer'], (DomLayer)->
       @$el.css 'background-color', @_color
 
     setBorderColor: (@_borderColor)->
-      @$el.css 'border-color', @_borderColor
+      @$el.css 'outline-color', @_borderColor
 
     setBorderWidth: (@_borderWidth)->
       if @_borderWidth
-        @$el.css 'border-style', 'solid'
+        @$el.css 'outline-style', 'solid'
       else
-        @$el.css 'border-style', 'none'
-      @$el.css 'border-width', @_borderWidth + 'px'
+        @$el.css 'outline-style', 'none'
+      @$el.css 'outline-width', @_borderWidth + 'px'
 
 
 

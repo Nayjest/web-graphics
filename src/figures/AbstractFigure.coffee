@@ -1,5 +1,5 @@
 define [], ()->
-  class AbstractCollisionChecker
+  class AbstractFigure
     constructor: (@layer)->
 
 

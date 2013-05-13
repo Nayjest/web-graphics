@@ -1,17 +1,17 @@
 define [
-  'components/graphics/lib/layers/AbstractLayer',
+  'components/graphics/lib/layers/AbstractActiveLayer',
   'components/graphics/lib/layers/canvas/CanvasViewport',
   'components/Vector2D/Vector2D',
   'components/jquery/jquery',
   'components/underscore/underscore'
 ], (
-AbstractLayer,
-CanvasViewport,
-Vector2D
-# JqueryEventsMixin
+  AbstractActiveLayer,
+  CanvasViewport,
+  Vector2D
+  # JqueryEventsMixin
 ) ->
 
-  class CanvasLayer extends AbstractLayer
+  class CanvasLayer extends AbstractActiveLayer
     viewportClass:CanvasViewport
     defaultDrawMethod: ->
         throw new Error "Draw method isn't specified."
@@ -23,33 +23,29 @@ Vector2D
 
     redraw: ->
       if @visible
-        pos = @getAbsolutePos()
+        pos = @getDrawPos()
+        @context.translate pos.x, pos.y
+        @context.rotate @angleRad
+        @context.translate -pos.x, -pos.y
         @drawMethod()
         @redrawChildren()
+        @context.translate pos.x, pos.y
+        @context.rotate -@angleRad
+        @context.translate -pos.x, -pos.y
 
-    getAbsolutePos: ->
-      super().add(@viewport.size.clone().divideScalar(2))
 
-    # Active layer
-    on: (eventName, handler) ->
-      #@todo support custom events
-      @_bindMouseEvent(eventName, handler)
+    # Position of layer center on canvas
+    getDrawPos: ->
+      @getAbsolutePos().add(@viewport.size.clone().divideScalar(2))
 
-    _bindMouseEvent: (eventName, handler) ->
-      if eventName in ['mouseover','mouseout']
-        @viewport.$el.on 'mousemove', (event)=>
-          pos = @getAbsolutePos()
-          if (Math.abs(pos.x - event.offsetX) < @size.x / 2) and (Math.abs(pos.y - event.offsetY) < @size.y / 2)
-            if !@_isHovered and eventName == 'mouseover'
-                @_isHovered = yes
-                handler.call @, event
-          else
-            if @_isHovered and eventName == 'mouseout'
-              @_isHovered = no
-              handler.call @, event
-      else
-        @viewport.$el.on eventName, (event)=>
-          # @todo: implement geometry, different collision checks
-          pos = @getAbsolutePos()
-          if (Math.abs(pos.x - event.offsetX) < @size.x / 2) and (Math.abs(pos.y - event.offsetY) < @size.y / 2)
-            handler.call @, event
+    getScreenPos: ->
+      @getCenterScreenPos().substract(@size.clone().multiplyScalar(0.5))
+
+    getCenterScreenPos: ->
+      domOffset = @viewport.$el.offset()
+      @getDrawPos().add(
+        x: domOffset.left - window.pageXOffset
+        y: domOffset.top  - window.pageYOffset
+      )
+      @getDrawPos()
+

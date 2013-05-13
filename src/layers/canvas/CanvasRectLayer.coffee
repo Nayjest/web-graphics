@@ -7,9 +7,9 @@ define ['components/graphics/lib/layers/canvas/CanvasLayer'], (CanvasLayer)->
       borderWidth: 0
 
     defaultDrawMethod: ->
-      pos = @getAbsolutePos()
+      pos = @getDrawPos()
       @context.beginPath()
-      @context.rect pos.x - @size.x/2, pos.y- @size.y/2, @size.x, @size.y
+      @context.rect pos.x - @size.x / 2, pos.y- @size.y / 2, @size.x, @size.y
       @context.fillStyle = @color
       @context.fill()
       if @borderWidth

@@ -1,7 +1,7 @@
-define ['components/graphics/figures/AbstractCollisionChecker', 'components/Vector2D/Vector2D', 'components/geometry/lib/Rectangle'], (AbstractCollisionChecker, Vector2D, Rectange)->
+define ['components/graphics/lib/figures/AbstractFigure', 'components/Vector2D/Vector2D', 'components/geometry/lib/Rectangle'], (AbstractFigure, Vector2D, Rectangle)->
 
-  class RectangleCollisionChecker extends AbstractCollisionChecker
+  class RectangleFigure extends AbstractFigure
     #@todo consider angle and zoom
     isPointInside: (point)->
-      Rectange.isPointInside point, @layer.pos, @layer.size, @layer.angleRad
+      Rectangle.isPointInside point, @layer.getAbsolutePos(), @layer.size, @layer.angleRad
 
